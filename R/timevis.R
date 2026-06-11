@@ -593,6 +593,12 @@ timevis_html <- function(id, style, class, ...){
         class = "btn btn-default btn-lg zoom-out",
         title = "Zoom out",
         "-"
+      ),
+      htmltools::tags$button(
+        type = "button",
+        class = "btn btn-default btn-lg zoom-reset saction-button",
+        title = "Reset to Initial View",
+        shiny::icon("fas fa-rotate-right")
       )
     )
   )

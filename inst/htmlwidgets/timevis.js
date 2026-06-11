@@ -19,6 +19,7 @@ HTMLWidgets.widget({
     var ctSel = null;
     var ctFil = null;
     var allItems;
+    var originalWindow = null;
 
     return {
 
@@ -38,6 +39,8 @@ HTMLWidgets.widget({
             .onclick = function(ev) { that.zoomInTimevis(opts.zoomFactor); };
           zoomMenu.getElementsByClassName("zoom-out")[0]
             .onclick = function(ev) { that.zoomOutTimevis(opts.zoomFactor); };
+          zoomMenu.getElementsByClassName("zoom-reset")[0]
+          .onclick = function(ev) { that.resetTimevis(); };
 
           // set listeners to events and pass data back to Shiny
           if (HTMLWidgets.shinyMode) {
@@ -163,6 +166,14 @@ HTMLWidgets.widget({
           timeline.fit({ animation : false });
         }
 
+        // Store the original window after fitting
+        if (originalWindow === null) {
+          originalWindow = {
+            start: timeline.getWindow().start,
+            end: timeline.getWindow().end
+          };
+        }
+
         // Show or hide the zoom button
         var zoomMenu = container.getElementsByClassName("zoom-menu")[0];
         if (opts.showZoom) {
@@ -236,6 +247,18 @@ HTMLWidgets.widget({
         timeline.setWindow({
           start   : newStart,
           end     : newEnd,
+          animation : animation
+        });
+      },
+      resetTimevis : function(animation) {
+        if (typeof animation === "undefined") {
+          animation = true;
+        }
+        if (originalWindow === null) return;
+
+        timeline.setWindow({
+          start     : originalWindow.start,
+          end       : originalWindow.end,
           animation : animation
         });
       },
