@@ -184,7 +184,8 @@ HTMLWidgets.widget({
         for (var i = 0; i < numApiCalls; i++) {
           if (opts['api'][i].method === 'setWindow' ||
               opts['api'][i].method === 'fitWindow' ||
-              opts['api'][i].method === 'centerTime') {
+              opts['api'][i].method === 'centerTime' ||
+              opts['api'][i].method === 'centerItem') {
             hasWindowCall = true;
             break;
           }

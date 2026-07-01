@@ -650,21 +650,21 @@ zoomOut <- function(id, percent = 0.5, animation = TRUE) {
 #' }
 #'
 #' if (interactive()) {
-# library(shiny)
-# shinyApp(
-#   ui = fluidPage(
-#     timevisOutput("timeline"),
-#     actionButton("btn", "Reset to initial view")
-#   ),
-#   server = function(input, output) {
-#     output$timeline <- renderTimevis(
-#       timevis()
-#     )
-#     observeEvent(input$btn, {
-#       resetTimevis("timeline")
-#     })
-#   }
-# )
+#' library(shiny)
+#' shinyApp(
+#'   ui = fluidPage(
+#'     timevisOutput("timeline"),
+#'     actionButton("btn", "Reset to initial view")
+#'   ),
+#'   server = function(input, output) {
+#'     output$timeline <- renderTimevis(
+#'       timevis()
+#'     )
+#'     observeEvent(input$btn, {
+#'       resetTimevis("timeline")
+#'     })
+#'   }
+#' )
 #' }
 #' @export
 resetTimevis <- function(id, animation = TRUE) {
