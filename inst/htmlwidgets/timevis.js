@@ -166,14 +166,6 @@ HTMLWidgets.widget({
           timeline.fit({ animation : false });
         }
 
-        // Store the original window after fitting
-        if (originalWindow === null) {
-          originalWindow = {
-            start: timeline.getWindow().start,
-            end: timeline.getWindow().end
-          };
-        }
-
         // Show or hide the zoom button
         var zoomMenu = container.getElementsByClassName("zoom-menu")[0];
         if (opts.showZoom) {
@@ -186,14 +178,52 @@ HTMLWidgets.widget({
         // functions that the user wantd to run on the timeline before it was
         // ready
         var numApiCalls = opts['api'].length;
+
+        // Check if any API call will change the window
+        var hasWindowCall = false;
+        for (var i = 0; i < numApiCalls; i++) {
+          if (opts['api'][i].method === 'setWindow' ||
+              opts['api'][i].method === 'fitWindow' ||
+              opts['api'][i].method === 'centerTime') {
+            hasWindowCall = true;
+            break;
+          }
+        }
         for (var i = 0; i < numApiCalls; i++) {
           var call = opts['api'][i];
           var method = call.method;
           delete call['method'];
           try {
             that[method](call);
-          } catch(err) {}
+            } catch(err) {}
         }
+
+        // Store the original window after fitting
+        if (originalWindow === null) {
+        if (hasWindowCall) {
+          // Skip the first rangechanged (from fit)
+          var fired = false;
+          timeline.on('rangechanged', function captureWindow() {
+            if (!fired) {
+              fired = true;  // skip first fire (fit)
+              return;
+            }
+            originalWindow = {
+              start : timeline.getWindow().start,
+              end   : timeline.getWindow().end
+            };
+            timeline.off('rangechanged', captureWindow);  // remove listener
+          });
+        } else {
+          // No window API calls, just capture after fit
+          timeline.once('rangechanged', function() {
+            originalWindow = {
+              start : timeline.getWindow().start,
+              end   : timeline.getWindow().end
+            };
+          });
+        }
+      }
 
         // If crosstalk is enabled, respect its selection
         allItems = opts.items;
@@ -255,7 +285,6 @@ HTMLWidgets.widget({
           animation = true;
         }
         if (originalWindow === null) return;
-
         timeline.setWindow({
           start     : originalWindow.start,
           end       : originalWindow.end,
@@ -329,7 +358,7 @@ HTMLWidgets.widget({
       },
       zoomOut : function(params) {
         timeline.zoomOut(params.percent, { animation : params.animation });
-      },
+      }
     };
   }
 });
@@ -340,7 +369,7 @@ if (HTMLWidgets.shinyMode) {
     ['addItem', 'addItems', 'removeItem', 'addCustomTime', 'removeCustomTime',
      'fitWindow', 'centerTime', 'centerItem', 'setItems', 'setGroups',
      'setOptions', 'setSelection', 'setWindow', 'setCustomTime', 'setCurrentTime',
-     'zoomIn', 'zoomOut'];
+     'zoomIn', 'zoomOut', 'resetTimevis'];
 
   var addShinyHandler = function(fxn) {
     return function() {
